@@ -1,0 +1,42 @@
+#!/usr/bin/env python3
+
+def solve_franklin_reiter():
+    # Data dari output.txt
+    n = 88183024196256411333484553213553846837622439231780396480967109312314357913174425385396184231905765939381960367698537125376473533288141531434345042789797178645864135392661922564207259941331338650097600270616742579575453179095821632880008651838424568933498141806505982361171994397688679468138932151808009068179
+    e = 3
+    c_question = 43862735413007212838921290204740237228920015804978660936092290351869586236148422881135933115705865580189043164227764444579442212567444887615221721393945266948407026475728221628198734395544594052170760423327865044863524666382485613853620502506826243391273684653499522966102384658131639487384266064123758554996
+    c_bang = 66665542371335779429364935032331984667182055425006583461719436282420129123847028566349996921560146372476231977506705605038813943625646058608138540817207845848101241000676402022548634430605544136846901869868655052580588798913771078650808191399486846694919669525753981881703314216258160513542942415095706258060
+    
+    # 1. Hitung Delta
+    # Delta = m_question - m_bang
+    # Posisi perbedaan ada di index ke-4 (b"?" vs b"!") -> shift sebanyak 44 bytes
+    # dan index terakhir (b"!" vs b"?") -> shift 0 byte
+    delta = 30 * (256**44) - 30
+    
+    c1 = c_bang
+    c2 = c_question
+    
+    # 2. Persamaan Franklin-Reiter untuk e = 3
+    # m1 = (delta * (c2 + 2*c1 - delta**3)) / (c2 - c1 + 2*delta**3) mod n
+    
+    delta_3 = pow(delta, 3, n)
+    
+    numerator = (delta * (c2 + 2 * c1 - delta_3)) % n
+    denominator = (c2 - c1 + 2 * delta_3) % n
+    
+    # 3. Hitung modular inverse dari penyebut
+    denominator_inv = pow(denominator, -1, n)
+    
+    # 4. Dapatkan m1 (m_bang)
+    m1 = (numerator * denominator_inv) % n
+    
+    # Ekstrak pesan menjadi bytes
+    message = m1.to_bytes((m1.bit_length() + 7) // 8, byteorder='big')
+    print("[+] Recovered Message:", message)
+    
+    # Parse flag (Hapus b"THEM!" di awal dan b"?" di akhir)
+    flag = message[5:-1]
+    print("\n[!] FLAG:", flag.decode(errors='ignore'))
+
+if __name__ == "__main__":
+    solve_franklin_reiter()
