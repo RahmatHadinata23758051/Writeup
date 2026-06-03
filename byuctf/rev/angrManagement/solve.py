@@ -1,0 +1,30 @@
+#!/usr/bin/env python3
+from pwn import context, remote
+
+
+HOST = "chals.cyberjousting.com"
+PORT = 1368
+
+PATH = [
+    256, 423, 495, 307, 39, 250, 391, 119, 105, 499, 123, 104,
+    536, 257, 608, 253, 74, 365, 543, 300, 571, 506, 595, 192,
+    383, 112, 17, 556, 93, 318, 114, 276, 18, 216, 449, 414,
+    124, 503, 71, 407, 78, 285, 481, 66, 381, 531, 82, 337,
+    600, 86, 230, 327, 472, 393, 348, 331, 14, 207, 402, 548,
+    528, 168, 530, 490, 378, 408, 518, 202, 87, 342, 329, 624,
+]
+
+
+def main():
+    context.log_level = "error"
+
+    payload = ("\n".join(map(str, PATH)) + "\n").encode()
+    io = remote(HOST, PORT)
+    io.send(payload)
+
+    output = io.recvall(timeout=10).decode(errors="replace")
+    print(output, end="")
+
+
+if __name__ == "__main__":
+    main()
